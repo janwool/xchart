@@ -4,12 +4,12 @@
 * @Copyright: 2015-2019 Erayt, Inc.
 * @Description: If you have some questions, please contact: xuechengwu@erayt.com.
 */
-import Polygon from '../../base/Polygon';
-import Canvas from '../../core/Canvas';
-import Point from '../../core/Point';
-import Camera from '../../3d/core/Camera';
-import Point3 from '../../3d/core/Point3';
-import Line from '../../base/Line';
+import Polygon from '@/base/Polygon';
+import Canvas from '@/core/Canvas';
+import Point from '@/core/Point';
+import Camera from '@/3d/core/Camera';
+import Point3 from '@/3d/core/Point3';
+import Line from '@/base/Line';
 function rotationX(point, angle) {
   const xAngle = angle / 180 * Math.PI;
   const xTrans = point.x;

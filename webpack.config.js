@@ -2,8 +2,8 @@ const webpack = require('webpack')
 const path = require('path')
 const entry = require('./webpack/entry');
 const extra = require('./webpack/extra');
-const entrys = entry(path.resolve(__dirname, './src/test'));
-const ExtraHtmls = extra(path.resolve(__dirname, './src/test'));
+const entrys = entry(path.resolve(__dirname, './test'));
+const ExtraHtmls = extra(path.resolve(__dirname, './test'));
 module.exports = {
     entry: entrys,
     output: {
@@ -53,6 +53,12 @@ module.exports = {
                 publicPath: '/'
             }
         }]
+    },
+    resolve: {
+        // 设置别名
+        alias: {
+            '@': path.join(__dirname, '/src'),
+        }
     },
     devtool:"eval-source-map",
     devServer: {

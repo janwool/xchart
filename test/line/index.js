@@ -4,35 +4,41 @@
 * @Copyright: 2015-2019 Erayt, Inc.
 * @Description: If you have some questions, please contact: xuechengwu@erayt.com.
 */
-import Candlestick from '../../react/Candlestick';
+import Line from '@/react/Line';
 import React from 'react';
 import './index.scss';
-import data from './data';
 import ReactDOM from "react-dom";
+import kdata from './data';
+const data = [];
+for(let i = 0; i < kdata.length; i++) {
+  data.push({
+    item: kdata[i].tiem,
+    close: kdata[i].close
+  });
+}
 
-
-export default class CandTest extends React.Component {
-  constructor(props) {
-    super(props);
-  }
-
+export default class LineTest extends React.Component {
   render() {
     return (
-      <Candlestick
+      <Line
         className="chart"
         data={data}
         style={{
           color: '#C3C3C3',
-          axisColor: '#999999',
-          xFontSize: 20,
-          yFontSize: 20,
+          fontColor: '#666666',
           enob: 4,
-          positiveType: Candlestick.BAR_TYPE.STROKE,
+          type: 2,
+          lineCap: Line.LINE_CAP.ROUND,
+          colors: {
+            close: '#3575D8',
+
+          }
         }}
+        onMouseOver={this.onMouseOver}
       />)
   }
 }
 ReactDOM.render(
-  <CandTest />,
+  <LineTest />,
   document.getElementById('root')
 )

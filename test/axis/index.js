@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import Canvas from '../../core/Canvas';
-import AxisLayer from '../../layer/AxisLayer';
+import Canvas from '@/core/Canvas';
+import AxisLayer from '@/layer/AxisLayer';
 import './index.scss';
 
 class AxisTest extends React.Component {

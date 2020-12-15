@@ -4,7 +4,7 @@
 * @Copyright: 2015-2019 Erayt, Inc.
 * @Description: If you have some questions, please contact: xuechengwu@erayt.com.
 */
-import Pie from '../../react/Pie';
+import Pie from '@/react/Pie';
 import React from 'react';
 import './index.scss';
 import ReactDOM from "react-dom";

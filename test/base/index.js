@@ -1,15 +1,15 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import Canvas from '../../core/Canvas';
-import Line from '../../base/Line';
-import Point from '../../core/Point';
-import Rectangle from '../../base/Rectangle';
-import Circle from '../../base/Circle';
-import Sector from '../../base/Sector';
-import RotateAction from '../../action/RotateAction';
-import Event from '../../event/Event';
-import Ring from '../../base/Ring';
-import Input from '../../base/Input';
+import Canvas from '@/core/Canvas';
+import Line from '@/base/Line';
+import Point from '@/core/Point';
+import Rectangle from '@/base/Rectangle';
+import Circle from '@/base/Circle';
+import Sector from '@/base/Sector';
+import RotateAction from '@/action/RotateAction';
+import Event from '@/event/Event';
+import Ring from '@/base/Ring';
+import Input from '@/base/Input';
 import './index.scss';
 
 class AxisTest extends React.Component {
