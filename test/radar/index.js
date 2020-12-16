@@ -9,7 +9,6 @@ import React from 'react';
 import './index.scss';
 import ReactDOM from "react-dom";
 
-
 export default class RadarTest extends React.Component {
   render() {
     return (

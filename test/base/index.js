@@ -10,7 +10,9 @@ import RotateAction from '@/action/RotateAction';
 import Event from '@/event/Event';
 import Ring from '@/base/Ring';
 import Input from '@/base/Input';
+import Curve from '@/base/Curve';
 import './index.scss';
+import Polygon from "@/base/Polygon";
 
 class AxisTest extends React.Component {
   constructor(props) {
@@ -146,11 +148,63 @@ class AxisTest extends React.Component {
       position: new Point(this.canvas.width / 2, this.canvas.height / 2),
     });
     this.canvas.addChild(input);
+    const points = [
+      { x: 50, y: 25},
+      { x: 20, y: 62.5},
+      { x: 75, y: 120},
+      { x: 130, y: 62.5},
+      { x: 100, y: 25},
+      { x: 75, y: 40}
+    ];
+    let curve = new Curve(this.canvas, {
+      position: new Point(75, 40),
+      points,
+    });
+    let polygon = new Polygon(this.canvas, {
+      points: [
+        {x: 75, y: 40},
+        { x: 50, y: 25},
+        { x: 20, y: 62.5},
+        { x: 75, y: 120},
+        { x: 130, y: 62.5},
+        { x: 100, y: 25},
+        { x: 75, y: 40}
+        ]
+    });
+    this.canvas.addChild(polygon);
+    this.canvas.addChild(curve);
+    for (let i = 0; i < points.length; i++) {
+      let p = new Point(points[i].x, points[i].y);
+      let c = new Circle(this.canvas, {
+        position: p,
+        type: Circle.TYPE.FILL,
+        radius: 3,
+        color: '#333333'
+      });
+      this.canvas.addChild(c);
+    }
     this.canvas.paint();
   }
 
   render() {
-    return <div className="axias-chart" ref={this.myRef}/>
+    return (
+      <React.Fragment>
+        <div className="menu-dash">
+          <div className="menu-dash-item">弧线</div>
+          <div className="menu-dash-item">圆形</div>
+          <div className="menu-dash-item">扇形</div>
+          <div className="menu-dash-item">环形</div>
+          <div className="menu-dash-item">直线</div>
+          <div className="menu-dash-item">折线</div>
+          <div className="menu-dash-item">曲线</div>
+          <div className="menu-dash-item">长方形</div>
+          <div className="menu-dash-item">多边形</div>
+          <div className="menu-dash-item">文本</div>
+          <div className="menu-dash-item">输入框</div>
+        </div>
+        <div className="axias-chart" ref={this.myRef}/>
+      </React.Fragment>
+    )
   }
 }
 

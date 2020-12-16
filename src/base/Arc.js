@@ -51,7 +51,6 @@ export default class Arc extends Node {
       }
       painter.strokeStyle = lingrad;
     }
-    console.log(this.radius);
     painter.arc(
       this.position.x / this.scaleX,
       this.position.y / this.scaleY,
