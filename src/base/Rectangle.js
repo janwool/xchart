@@ -7,11 +7,17 @@ export default class Rectangle extends Node {
     FILL: 2,
   }
 
+  static LINE_CAP = {
+    BUTT: 'butt',
+    ROUND: 'round',
+    SQUARE: 'square'
+  }
+
   constructor(canvas, style) {
     super(canvas, style);
     this.type = style.type || Rectangle.TYPE.STROKE;
-    this.width = style.width || 0;
-    this.height = style.height || 0;
+    this.width = style.width || 200;
+    this.height = style.height || 400;
     this.lineWidth = style.lineWidth || 3;
     this.lineDash = style.lineDash || [];
   }
@@ -47,19 +53,6 @@ export default class Rectangle extends Node {
       } else {
         painter.fillStyle = lingrad;
       }
-    }
-    // 设置阴影
-    if (!!this.shadowOffsetX) {
-      painter.shadowOffsetX = this.shadowOffsetX;
-    }
-    if (!!this.shadowOffsetY) {
-      painter.shadowOffsetY = this.shadowOffsetY;
-    }
-    if (!!this.shadowBlur) {
-      painter.shadowBlur = this.shadowBlur;
-    }
-    if (!!this.shadowColor) {
-      painter.shadowColor = this.shadowColor;
     }
     if (this.type === Rectangle.TYPE.STROKE) {
       painter.strokeRect(

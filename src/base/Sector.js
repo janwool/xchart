@@ -9,7 +9,7 @@ export default class Sector extends Node {
   constructor(canvas, style) {
     super(canvas, style);
     this.start = style.start || 0;
-    this.stop = style.stop || 2 * Math.PI;
+    this.stop = style.stop || 360;
     this.radius = style.radius || 3;
     this.type = style.type || Sector.TYPE.STROKE;
     this.lineWidth = style.lineWidth || 3;
@@ -45,26 +45,13 @@ export default class Sector extends Node {
         painter.fillStyle = lingrad;
       }
     }
-    // 设置阴影
-    if (!!this.shadowOffsetX) {
-      painter.shadowOffsetX = this.shadowOffsetX;
-    }
-    if (!!this.shadowOffsetY) {
-      painter.shadowOffsetY = this.shadowOffsetY;
-    }
-    if (!!this.shadowBlur) {
-      painter.shadowBlur = this.shadowBlur;
-    }
-    if (!!this.shadowColor) {
-      painter.shadowColor = this.shadowColor;
-    }
     painter.beginPath();
     painter.arc(
       this.position.x / this.scaleX,
       this.position.y / this.scaleY,
       this.radius,
-      this.start,
-      this.stop
+      this.start / 180 * Math.PI,
+      this.stop / 180 * Math.PI,
     );
     painter.lineTo(
       this.position.x / this.scaleX,
@@ -94,9 +81,9 @@ export default class Sector extends Node {
       atan = Math.PI * 2 + atan;
     }
     if (this.stop < this.start) {
-      return atan >= this.start || atan <= this.stop;
+      return atan >= this.start / 180 * Math.PI || atan <= this.stop / 180 * Math.PI;
     } else {
-      return atan >= this.start && atan <= this.stop;
+      return atan >= this.start / 180 * Math.PI && atan <= this.stop / 180 * Math.PI;
     }
   }
 }

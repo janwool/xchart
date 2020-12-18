@@ -35,6 +35,7 @@ export default class Arc extends Node {
     // 设置线框
     painter.lineWidth = this.lineWidth;
     painter.strokeStyle = this.color;
+    painter.fillStyle = this.color;
     // 设置线条末端样式
     painter.lineCap = this.lineCap;
     // 设置虚线样式

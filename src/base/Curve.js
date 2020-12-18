@@ -8,13 +8,23 @@
 import Node from '@/core/Node';
 
 export default class Curve extends Node {
-  constructor(canvas, style) {
+  static LINE_CAP = {
+    BUTT: 'butt',
+    ROUND: 'round',
+    SQUARE: 'square'
+  }
+  static TYPE = {
+    STROKE: 1,
+    FILL: 2,
+  }
+  constructor(canvas, style, points = []) {
     super(canvas, style);
     this.lineWidth = style.lineWidth || 3;
     this.lineCap = style.lineCap || Curve.LINE_CAP.BUTT;
     this.lineDash = style.lineDash || [];
     this.lineDashOffset = style.lineDashOffset || 0;
-    this.points = style.points || [];
+    this.type = style.type || Curve.TYPE.STROKE;
+    this.points = points;
   }
 
   calculateControlPoint(points) {
@@ -75,12 +85,6 @@ export default class Curve extends Node {
     return x;
   }
 
-  static LINE_CAP = {
-    BUTT: 'butt',
-    ROUND: 'round',
-    SQUARE: 'square'
-  }
-
   draw (painter) {
     if (this.points.length < 2) {
       return;
@@ -88,7 +92,11 @@ export default class Curve extends Node {
     painter.beginPath();
     // 设置线框
     painter.lineWidth = this.lineWidth;
-    painter.strokeStyle = this.color;
+    if (this.type === Curve.TYPE.STROKE) {
+      painter.strokeStyle = this.color;
+    } else {
+      painter.fillStyle = this.color;
+    }
     // 设置线条末端样式
     painter.lineCap = this.lineCap;
     // 设置虚线样式
@@ -105,20 +113,24 @@ export default class Curve extends Node {
       painter.strokeStyle = lingrad;
     }
     const [firstControlPoints, secondControlPoints] = this.calculateControlPoint([this.position, ...this.points]);
-    console.log('firstControlPoints==>', firstControlPoints, secondControlPoints, this.points);
-    painter.moveTo(this.position.x, this.position.y);
     painter.translate(0, 2 * this.position.y);
-    for (let i = 1; i < this.points.length; i++) {
+    painter.moveTo(this.position.x, -this.position.y);
+
+    for (let i = 0; i < this.points.length; i++) {
       painter.bezierCurveTo(
-        firstControlPoints[i - 1].x,
-        firstControlPoints[i - 1].y,
-        secondControlPoints[i - 1].x,
-        secondControlPoints[i - 1].y,
+        firstControlPoints[i].x,
+        -firstControlPoints[i].y,
+        secondControlPoints[i].x,
+        -secondControlPoints[i].y,
         this.points[i].x,
-        this.points[i].y
+        -this.points[i].y
         );
     }
-    painter.closePath();
-    painter.stroke();
+    if (this.type === Curve.TYPE.STROKE) {
+      painter.stroke();
+    } else {
+      painter.closePath();
+      painter.fill();
+    }
   }
 }

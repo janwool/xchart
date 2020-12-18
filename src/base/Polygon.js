@@ -28,19 +28,6 @@ export default class Polygon extends Node {
     } else {
       painter.fillStyle = this.color;
     }
-    // 设置阴影
-    if (!!this.shadowOffsetX) {
-      painter.shadowOffsetX = this.shadowOffsetX;
-    }
-    if (!!this.shadowOffsetY) {
-      painter.shadowOffsetY = this.shadowOffsetY;
-    }
-    if (!!this.shadowBlur) {
-      painter.shadowBlur = this.shadowBlur;
-    }
-    if (!!this.shadowColor) {
-      painter.shadowColor = this.shadowColor;
-    }
     painter.translate(0, 2 * this.position.y);
     painter.beginPath();
     painter.moveTo(this.points[0].x, -this.points[0].y);

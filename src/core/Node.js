@@ -130,6 +130,19 @@ export default class Node {
       painter.translate(- this.position.x, - this.position.y);
       painter.scale(this.scaleX, this.scaleY);
       painter.textAlign = this.textAlign;
+      // 设置阴影
+      if (!!this.shadowOffsetX) {
+        painter.shadowOffsetX = this.shadowOffsetX;
+      }
+      if (!!this.shadowOffsetY) {
+        painter.shadowOffsetY = this.shadowOffsetY;
+      }
+      if (!!this.shadowBlur) {
+        painter.shadowBlur = this.shadowBlur;
+      }
+      if (!!this.shadowColor) {
+        painter.shadowColor = this.shadowColor;
+      }
       this.draw(painter);
       painter.restore();
       config.after && config.after(this, painter);

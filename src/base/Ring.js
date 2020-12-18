@@ -50,19 +50,6 @@ export default class Ring extends Node {
         painter.fillStyle = lingrad;
       }
     }
-    // 设置阴影
-    if (!!this.shadowOffsetX) {
-      painter.shadowOffsetX = this.shadowOffsetX;
-    }
-    if (!!this.shadowOffsetY) {
-      painter.shadowOffsetY = this.shadowOffsetY;
-    }
-    if (!!this.shadowBlur) {
-      painter.shadowBlur = this.shadowBlur;
-    }
-    if (!!this.shadowColor) {
-      painter.shadowColor = this.shadowColor;
-    }
     painter.beginPath();
     // 顺时针绘制长弧度
     painter.arc(
