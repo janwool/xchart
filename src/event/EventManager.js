@@ -16,6 +16,8 @@ import TouchEndEvent from './TouchEndEvent';
 import DragEndEvent from './DragEndEvent';
 import MouseWheelEvent from './MouseWheelEvent';
 import MouseUpEvent from './MouseUpEvent';
+import MouseOutEvent from './MouseOutEvent';
+import MouseInEvent from "@/event/MouseInEvent";
 
 
 export default class EventManager {
@@ -24,6 +26,8 @@ export default class EventManager {
     this.listeners = [];
     this.processQueue = []; // 事件处理队列
     this.moveQueue = []; // 拖动事件处理队列
+    this.mouseEnterQueue = [];
+    this.mouseOuterQueue = []; // 鼠标移出队列
     this.canvas.onmousedown = (e) => {
       this.mouseDown(e);
     };
@@ -42,6 +46,14 @@ export default class EventManager {
     this.canvas.ontouchmove = (e) => {
       this.touchMove(e);
     };
+
+    this.canvas.onmouseenter = (e) => {
+      this.mouseEnter(e);
+    }
+
+    this.canvas.onmouseout = (e) => {
+      this.mouseOut(e);
+    }
 
     this.canvas.onmousewheel = (e) => {
       this.mouseWheel(e);
@@ -89,6 +101,27 @@ export default class EventManager {
         break;
       }
     }
+  }
+
+  /**
+   * 鼠标移入事件
+   * @param e
+   */
+  mouseEnter(e) {
+
+  }
+
+  /**
+   * 鼠标移出事件
+   * @param e
+   */
+  mouseOut(e) {
+    for (const event of this.mouseOuterQueue) {
+      if (!event.isProcessed) {
+        event.doEvent();
+      }
+    }
+    this.mouseOuterQueue.splice(0, this.mouseOuterQueue.length);
   }
 
   /**
@@ -184,6 +217,55 @@ export default class EventManager {
     const mouseY = (e.clientY - box.top) * this.canvas.height / box.height;
     // 根据坐标系规则变化坐标
     const point = new Point(mouseX, this.canvas.height - mouseY);
+    // 遍历监听器，寻找符合事件触发条件的监听器
+    for (const listener of this.listeners) {
+      if (listener.obj !== null && listener.obj instanceof Node) {
+        // 若事件点击点包含于图元中
+        if (listener.obj.containsPoint(point)) {
+          // 声明事件对象
+          let event = null;
+          if (listener.event.event === Event.EVENT_MOUSE_IN) {
+            // 事件类型为点击事件，构建点击事件
+            const filterIndex = this.mouseEnterQueue.findIndex(vo => vo.node === listener.obj);
+            if (filterIndex === -1) {
+              event = new MouseInEvent(listener.event.callback);
+              event.node = listener.obj;
+              event.eventPoint = point;
+              event.clientPoint = { x: e.clientX, y: e.clientY };
+              this.mouseEnterQueue.push(event);
+            }
+          } else if (listener.event.event === Event.EVENT_MOUSE_OUT) {
+            const filterIndex = this.mouseOuterQueue.findIndex(vo => vo.node === listener.obj);
+            if (filterIndex === -1) {
+              event = new MouseOutEvent(listener.event.callback);
+              event.node = listener.obj;
+              event.eventPoint = point;
+              event.clientPoint = { x: e.clientX, y: e.clientY };
+              this.mouseOuterQueue.push(event);
+            }
+          }
+        }
+      }
+    }
+    for (const event of this.mouseOuterQueue) {
+      if (!event.isProcessed) {
+        if (!event.node.containsPoint(point)) {
+          event.doEvent();
+          this.mouseOuterQueue.splice(this.mouseOuterQueue.findIndex(e => e ===event), 1);
+        }
+      }
+    }
+    for (const event of this.mouseEnterQueue) {
+      if (!event.node.containsPoint(point)) {
+        this.mouseEnterQueue.splice(this.mouseEnterQueue.findIndex(e => e === event ), 1);
+      } else {
+        // 鼠标移动事件
+        Promise.resolve().then(() => {
+          // 调用鼠标移动事件的moving方法处理事件
+          event.moving(point);
+        });
+      }
+    }
     // 遍历移动事件队列moveQueue
     for (const event of this.moveQueue) {
       if (!event.isProcessed) {
@@ -204,6 +286,8 @@ export default class EventManager {
           setTimeout(() => {
             event.setEndPoint(point);
           }, 0);
+        } else if (event instanceof MouseOutEvent) {
+
         }
       }
     }

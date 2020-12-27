@@ -52,6 +52,18 @@ export default class Canvas {
     this.canvas.onmousewheel = func;
   }
 
+  set onmouseout(func) {
+    this.canvas.onmouseout = func;
+  }
+
+  set onmouseleave(func) {
+    this.canvas.onmouseleave = func;
+  }
+
+  set onmouseenter(func) {
+    this.canvas.onmouseenter = func;
+  }
+
   get width() {
     return this.canvas.width;
   }
@@ -106,6 +118,13 @@ export default class Canvas {
   startAction() {
     this.canAction = true;
     this.paint();
+  }
+
+  getClientPosition(point) {
+    const box = this.canvas.getBoundingClientRect();
+    const clientX = box.width * point.x / this.width + box.left;
+    const clientY = box.height * (this.height - point.y) / this.height + box.top;
+    return { clientX, clientY };
   }
 
   paint(before, after) {

@@ -39,23 +39,23 @@ export default class LineLayer extends Layer {
     let start = this.data.length - this.showNum;
     if (kLeft > 0 && this.data.length > kLeft + this.showNum) {
       // 向右移动数量与显示数量小于数据量， 结束索引等于数据量-偏移量
-      end = this.data.length - kLeft;
-      start = end - this.showNum;
+      end = this.data.length - kLeft-1;
+      start = end - this.showNum + 1;
     } else if (kLeft > 0) {
       // 向右移动数量超过数据量， 结束索引等于显示数量
-      end = this.showNum;
+      end = this.showNum - 1;
       start = 0;
     } else {
       // 向左移动
       end = this.data.length - 1;
-      start = end - this.showNum - kLeft;
+      start = end - this.showNum - kLeft + 1;
     }
     this.start = start;
     this.end = end;
     let max = -99999999; // 数据最大值
     let min = 99999999; // 数据最小值
     //遍历数据，确定最大值与最小值
-    for (let i = start; i < end; i++) {
+    for (let i = start; i <= end; i++) {
       for (let key in this.data[i]) {
         if (key !== 'item') {
           if (max < this.data[i][key]) {
@@ -69,11 +69,11 @@ export default class LineLayer extends Layer {
     }
     // 计算Y方向单位数值所占用的长度
     const yStep = this.height / (max - min);
-
+    this.yStep = yStep;
     // 记录各线条所在的点
     const linePoints = {};
     // 遍历数据计算点的位置
-    for (let i = start; i < end; i++) {
+    for (let i = start; i <= end; i++) {
       const data = this.data[i];
       for(let key in data) {
         if (key !== 'item') {

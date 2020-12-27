@@ -85,7 +85,6 @@ export default class AxisLayer extends BaseLayer {
                     // 确保X轴在最高字体之上
                     xHeight = xAxisText.height;
                 }
-                console.log(xAxisText);
                 xLabels.push(xAxisText);
             }
         } else {
@@ -103,7 +102,6 @@ export default class AxisLayer extends BaseLayer {
                     font: xAxisTextFont,
                     color: xAxisTextColor
                 });
-                xAxisText.setPosition(this.xAxisLabels[i].position.x - xAxisText.width / 2, this.xAxisLabels[i].position.y);
                 if (xAxisText.height > xHeight) {
                     xHeight = xAxisText.height;
                 }
@@ -171,7 +169,6 @@ export default class AxisLayer extends BaseLayer {
             // 添加纵向网格线
             this.addChild(xLine);
             //设置坐标值
-            console.log(xLabels[i]);
             if (xLabels[i]) {
                 if (this.xAxisType === AxisLayer.AxisType.NUMBER) {
                     if (i === 0) {
@@ -181,13 +178,16 @@ export default class AxisLayer extends BaseLayer {
                     } else {
                         xLabels[i].setPosition(positionX - xLabels[i].width / 2, this.position.y);
                     }
-                    console.log(xLabels[i]);
                     this.addChild(xLabels[i]);
                 }
             }
         }
         if (this.xAxisType === AxisLayer.AxisType.LABEL) {
+            const xAxisStep = (this.width - yWidth) / xLabels.length;
             for (let i = 0; i < xLabels.length; i++) {
+                const posX = this.xAxisLabels[i].position ? this.xAxisLabels[i].position.x + yWidth : i * xAxisStep + yWidth;
+                const posY = this.xAxisLabels[i].position ? this.xAxisLabels[i].position.y + this.position.y : this.position.y;
+                xLabels[i].setPosition(posX - xLabels[i].width / 2, posY);
                 this.addChild(xLabels[i]);
             }
         }

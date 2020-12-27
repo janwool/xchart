@@ -27,7 +27,6 @@ export default class AccelerateAction extends Action {
         const t = 1 / this.fps;
         const vX = this.speedX + frame / this.fps * this.accelerateX / 1000;
         const vY = this.speedY + frame / this.fps * this.accelerateY / 1000;
-        console.log('accelerate',this.speedX,  frame, vX, vY);
         const distX = vX * t + 0.5 * this.accelerateX * t * t;
         const distY = vY * t + 0.5 * this.accelerateY * t * t;
         if (!node.locked) {

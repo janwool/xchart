@@ -10,7 +10,7 @@ import Sector from '@/base/Sector';
 import RotateAction from '@/action/RotateAction';
 import Event from '@/event/Event';
 import Ring from '@/base/Ring';
-import Input from '@/base/Input';
+import Text from '@/base/Text';
 import Curve from '@/base/Curve';
 import './index.scss';
 import Polygon from "@/base/Polygon";
@@ -87,8 +87,19 @@ class AxisTest extends React.Component {
           });
           break;
         case 'polygon':
+          this.node = new Polygon(this.canvas, {}, [
+            new Point(this.canvas.width / 2, this.canvas.height / 2 + 100),
+            new Point(this.canvas.width / 2 + Math.cos(Math.PI / 6) * 100, this.canvas.height / 2 - Math.sin(Math.PI / 6) * 100),
+            new Point(this.canvas.width / 2 + Math.cos(Math.PI * 5 / 6) * 100, this.canvas.height / 2 - Math.sin(Math.PI / 6) * 100)
+          ]);
           break;
         case 'text':
+          this.node = new Text(this.canvas, {
+            text: '文本',
+            position: new Point(this.canvas.width / 2, this.canvas.height / 2),
+            font: 'Aprial',
+            size: 30,
+          });
           break;
       }
       this.canvas.addChild(this.node);
@@ -361,6 +372,69 @@ class AxisTest extends React.Component {
     }
   }
 
+  /**
+   * 多边形修改
+   */
+  onPolygonChange = (e) => {
+    let n = Number(e.currentTarget.value);
+    n = isNaN(n) ? 3 : n;
+    if (this.node && n >= 3) {
+      const deltaAngle = Math.PI * 2 / n;
+      let points = [];
+      for (let i = 0; i < n; i++) {
+        const x = 100 * Math.cos(i * deltaAngle) + this.canvas.width / 2;
+        const y = 100 * Math.sin(i * deltaAngle) + this.canvas.height / 2;
+        points.push(new Point(x, y));
+      }
+      this.node.points = points;
+      this.canvas.paint();
+    }
+  }
+
+  /**
+   * 文本框内容修改
+   */
+  onTextChange = (e) => {
+    const text = e.currentTarget.value;
+    if (this.node) {
+      this.node.text = text;
+      this.canvas.paint();
+    }
+  }
+
+  /**
+   * 字体修改
+   */
+  onFontChange = (e) => {
+    const font = e.currentTarget.value;
+    if (this.node) {
+      this.node.font = font;
+      this.canvas.paint();
+    }
+  }
+
+  /**
+   * 字体大小修改
+   */
+  onFontSizeChange = (e) => {
+    let fontSize = Number(e.currentTarget.value);
+    fontSize = isNaN(fontSize) ? 20 : fontSize;
+    if (this.node) {
+      this.node.size = fontSize;
+      this.canvas.paint();
+    }
+  }
+
+  /**
+   * 对齐方式修改
+   **/
+  onTextAlignChange = (e) => {
+    let textAlign = e.currentTarget.value;
+    if (this.node) {
+      this.node.textAlign = textAlign;
+      this.canvas.paint();
+    }
+  }
 
   render() {
     const { type } = this.state;
@@ -615,9 +689,9 @@ class AxisTest extends React.Component {
               )
             }
             {/** Line 属性结束 **/}
-            {/** Rectangle 属性开始 **/}
+            {/** Rectangle, Polygon 属性开始 **/}
             {
-              type === 'rectangle' && (
+              (type === 'rectangle'|| type === 'polygon') && (
                 <React.Fragment>
                   <div className="form-box">
                     <div className="form-control-box">
@@ -632,27 +706,56 @@ class AxisTest extends React.Component {
                         <input type="text" onChange={this.onPositionChange} placeholder="用逗号,隔开" />
                       </div>
                     </div>
-                    <div className="form-control-box">
-                      <label>宽(width)</label>
-                      <div className="form-control-input">
-                        <input type="number" onChange={this.onRectangleWidthChange} />
-                      </div>
-                    </div>
-                    <div className="form-control-box">
-                      <label>高(height)</label>
-                      <div className="form-control-input">
-                        <input type="number" onChange={this.onRectangleHeightChange}/>
-                      </div>
-                    </div>
-                    <div className="form-control-box">
-                      <label>类型</label>
-                      <div className="form-control-input">
-                        <select onChange={this.onTypeChange}>
-                          <option value={Rectangle.TYPE.STROKE}>STROKE</option>
-                          <option value={Rectangle.TYPE.FILL}>FILL</option>
-                        </select>
-                      </div>
-                    </div>
+                    {
+                      type === 'rectangle' && (
+                        <React.Fragment>
+                          <div className="form-control-box">
+                            <label>宽(width)</label>
+                            <div className="form-control-input">
+                              <input type="number" onChange={this.onRectangleWidthChange} />
+                            </div>
+                          </div>
+                          <div className="form-control-box">
+                            <label>高(height)</label>
+                            <div className="form-control-input">
+                              <input type="number" onChange={this.onRectangleHeightChange}/>
+                            </div>
+                          </div>
+                          <div className="form-control-box">
+                            <label>类型</label>
+                            <div className="form-control-input">
+                              <select onChange={this.onTypeChange}>
+                                <option value={Rectangle.TYPE.STROKE}>STROKE</option>
+                                <option value={Rectangle.TYPE.FILL}>FILL</option>
+                              </select>
+                            </div>
+                          </div>
+                        </React.Fragment>
+                      )
+                    }
+                    {
+                      type === 'polygon' && (
+                        <React.Fragment>
+                          <div className="form-control-box">
+                            <label>形状</label>
+                            <div className="form-control-input">
+                              <input type="number" placeholder="请输入数字表示N边形" onChange={this.onPolygonChange} />
+                            </div>
+                          </div>
+
+                          <div className="form-control-box">
+                            <label>类型</label>
+                            <div className="form-control-input">
+                              <select onChange={this.onTypeChange}>
+                                <option value={Polygon.TYPE.STROKE}>STROKE</option>
+                                <option value={Polygon.TYPE.FILL}>FILL</option>
+                              </select>
+                            </div>
+                          </div>
+                        </React.Fragment>
+                      )
+                    }
+
                     <div className="form-control-box">
                       <label>末端样式(lineCap)</label>
                       <div className="form-control-input">
@@ -709,7 +812,66 @@ class AxisTest extends React.Component {
                 </React.Fragment>
               )
             }
-            {/** Rectangle 属性结束 **/}
+            {/** Rectangle, Polygon 属性结束 **/}
+            {/** Text 属性开始 **/}
+            {
+              type === 'text' && (
+                <React.Fragment>
+                  <div className="form-box">
+                    <div className="form-control-box">
+                      <label>位置</label>
+                      <div className="form-control-input">
+                        <input type="text" placeholder="输入坐标，用,隔开" onChange={this.onPositionChange} />
+                      </div>
+                    </div>
+                    <div className="form-control-box">
+                      <label>文本</label>
+                      <div className="form-control-input">
+                        <input type="text" onChange={this.onTextChange} />
+                      </div>
+                    </div>
+                    <div className="form-control-box">
+                      <label>字体</label>
+                      <div className="form-control-input">
+                        <input type="text" onChange={this.onFontChange} />
+                      </div>
+                    </div>
+                    <div className="form-control-box">
+                      <label>字体大小</label>
+                      <div className="form-control-input">
+                        <input type="number" onChange={this.onFontSizeChange}/>
+                      </div>
+                    </div>
+                    <div className="form-control-box">
+                      <label>颜色</label>
+                      <div className="form-control-input">
+                        <input type="color" onChange={this.onColorChange}/>
+                      </div>
+                    </div>
+                    <div className="form-control-box">
+                      <label>类型</label>
+                      <div className="form-control-input">
+                        <select onChange={this.onTypeChange}>
+                          <option value={Text.TYPE.STROKE}>STROKE</option>
+                          <option value={Text.TYPE.FILL}>FILL</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div className="form-control-box">
+                      <label>对齐方式</label>
+                      <div className="form-control-input">
+                        <select onChange={this.onTextAlignChange}>
+                          <option value="left">left</option>
+                          <option value="center">center</option>
+                          <option value="right">right</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                </React.Fragment>
+              )
+            }
+            {/** Text 属性结束 **/ }
           </div>
           <div className="base-chart" ref={this.myRef}/>
         </div>

@@ -10,4 +10,9 @@ export default class extends Event {
   constructor(callback) {
     super(Event.EVENT_MOUSE_OUT, callback);
   }
+
+  doEvent() {
+    this.callback(this);
+    super.doEvent();
+  }
 }

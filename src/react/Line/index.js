@@ -11,6 +11,7 @@ import AxisLayer from '../../layer/AxisLayer';
 import AccelerateAction from '../../action/AccelerateAction'
 import Point from "../../core/Point";
 import Event from '../../event/Event';
+import Text from '../../base/Text';
 
 export default class extends React.Component {
   static LINE_CAP = {
@@ -24,17 +25,56 @@ export default class extends React.Component {
   }
 
   componentWillReceiveProps (nextProps, nextContext) {
-    const { data = [] } = nextProps;
+    const { data = [], style = {} } = nextProps;
     if (data !== this.props.data) {
+      const yWidth = this.calYWidth(data, style)
       this.line.data = data;
+      this.line.width = this.canvas.width - yWidth;
+      this.line.shiftLeft = yWidth;
       this.line.make();
       this.canvas.paint();
     }
   }
 
+  /**
+   * 计算Y轴宽度
+   * @param data
+   */
+  calYWidth(data, style) {
+    if (style.yAxisPosition === AxisLayer.AxisPosition.INNER || data.length === 0) {
+      return 0;
+    }
+    let min = Number.MAX_VALUE, max = Number.MIN_VALUE;
+    for (let i = 0; i < data.length; i++) {
+      const item = data[i];
+      for (let key in item) {
+        if (key !== 'item') {
+          if (min > item[key]) {
+            min = item[key];
+          }
+          if (max < item[key]) {
+            max = item[key];
+          }
+        }
+      }
+      const { enob = 2 } = style;
+      const txtStyle = {
+        text: '',
+        size: style.yFontSize || 20,
+        color: style.fontColor || '#999999',
+        font: style.fontFamily || 'PingFang SC',
+      }
+      const maxTxt = new Text(this.canvas, { ...txtStyle, text: max.toFixed(enob)});
+      const minTxt = new Text(this.canvas, { ...txtStyle, text: min.toFixed(enob)});
+      if (maxTxt.width > minTxt.width) {
+        return maxTxt.width;
+      }
+      return minTxt.width;
+    }
+  }
+
   componentDidMount () {
     const { style = {}, data = [] } = this.props;
-    console.log(data);
     this.canvas = new Canvas({
       ele: this.ref.current,
       canAction: false,
@@ -47,8 +87,8 @@ export default class extends React.Component {
       xAxisType: AxisLayer.AxisType.LABEL,  // x轴时间为字符型
       xAxisGraduations: style.xAxis || 5,   // 网格5列
       yAxisGraduations: style.yAxis || 5,   // 网格5行
-      xAxisPosition: AxisLayer.AxisPosition.BLOCK,  // X轴坐标不计算
-      yAxisPosition: AxisLayer.AxisPosition.BLOCK,  // Y轴坐标计算
+      xAxisPosition: style.xAxisPosition || AxisLayer.AxisPosition.BLOCK,  // X轴坐标不计算
+      yAxisPosition: style.xAxisPosition || AxisLayer.AxisPosition.BLOCK,  // Y轴坐标计算
       yAxisRender: (value) => {
         const enob = style.enob || 2;
         return {
@@ -69,19 +109,21 @@ export default class extends React.Component {
       },
       color: style.color,
     });
+    const yWidth = this.calYWidth(data, style);
     this.line = new LineLayer(this.canvas, {
-      width: this.canvas.width - yFontSize * 4,
+      width: this.canvas.width - yWidth,
       height: (this.canvas.height - xFontSize * this.canvas.ratio) * 0.8, // 预留20%的空白空间
       colors: style.colors,
-      shiftLeft: yFontSize * 4,
+      shiftLeft: yWidth,
       type: style.type || LineLayer.TYPE.STROKE,
       position: new Point(
-        yFontSize * 4,
+        0,
         xFontSize * this.canvas.ratio * 0.9 + this.canvas.height * 0.1
       )
     }, data);
     this.line.onMaked = (layer, option) => {
       const { xStep, yStep, yMax, yMin, start, end } = option;
+      const xFontSize = Number(style.xFontSize || 20);
       // 计算坐标系坐标数值
       const yAxisMax = yMax + (this.canvas.height - xFontSize * this.canvas.ratio) * 0.1 / yStep;
       const yAxisMin = yMin - (this.canvas.height - xFontSize * this.canvas.ratio) * 0.1 / yStep;
@@ -89,18 +131,24 @@ export default class extends React.Component {
       // 假设间距为100个画布像素
       let dataNum = Math.round(this.line.width / 100);
       // 计算100画布像素索引距离
-      let indexStep = Math.round(100 / xStep);
+      let indexStep = Math.round(300 / xStep);
       // x轴坐标数组
       let xAxisData = [];
-      for (let i = 0; i < dataNum; i++) {
-        console.log(this.line.position.x + (end - 1 - i * indexStep - start) * xStep)
-        if (end - 1 - i > start) {
-          const label = data[end - 1 - i * indexStep].item;
-          xAxisData.unshift({
-            value: label,
-            position: new Point(this.line.position.x + (end - 1 - i * indexStep - start) * xStep, 0),
-          });
-        }
+      let i = start;
+      for (; i <= end; i += indexStep) {
+        const label = data[i].item;
+        xAxisData.push({
+          value: label,
+          position: new Point((i - start) * xStep, 0),
+        });
+      }
+      if (i !== end) {
+        const posX = (end - start) * xStep;
+        xAxisData.pop();
+        xAxisData.push({
+          value: data[end].item,
+          position: new Point(posX, 0),
+        });
       }
       this.axisLayer.yAxisMin = yAxisMin;
       this.axisLayer.yAxisMax = yAxisMax;
@@ -112,7 +160,6 @@ export default class extends React.Component {
     this.canvas.paint();
     // 监听拖动事件
     this.line.addEventListener(Event.EVENT_DRAG, (e) => {
-      console.log(11);
       this.onChartDrag(e);
     });
     // 拖动结束事件
@@ -122,6 +169,56 @@ export default class extends React.Component {
     // 监听滚轮缩放
     this.line.addEventListener(Event.EVENT_WHEEL, (e) => {
       this.onChartScale(e);
+    });
+    this.line.addEventListener(Event.EVENT_MOUSE_IN, (e) => {
+      if (this.props.onMouseOver) {
+        const { curPoint } = e;
+        const dataIndex = Math.round((curPoint.x - e.node.shiftLeft) / e.node.xStep);
+        if (
+          dataIndex + e.node.start <= e.node.end
+          && (e.node.end - e.node.start) * e.node.xStep + e.node.shiftLeft > curPoint.x
+        ) {
+          const data = e.node.data[dataIndex + e.node.start];
+          const { clientX, clientY } = this.canvas.getClientPosition(curPoint);
+          const dataPosition = this.canvas.getClientPosition(
+            new Point(
+              e.node.shiftLeft + dataIndex * e.node.xStep,
+              curPoint.y
+            )
+          );
+          this.props.onMouseOver({
+            clientX,
+            clientY,
+            data,
+            dataX: dataPosition.clientX,
+            dataY: dataPosition.clientY,
+            eventX: curPoint.x,
+            eventY: curPoint.y,
+            node: e.node,
+            canvas: this.canvas,
+          });
+        } else {
+          const { clientX, clientY } = this.canvas.getClientPosition(curPoint);
+          this.props.onMouseOver({
+            clientX,
+            clientY,
+            data: null,
+            eventX: curPoint.x,
+            eventY: curPoint.y,
+            node: e.node,
+            canvas: this.canvas,
+          });
+        }
+      }
+    });
+    this.line.addEventListener(Event.EVENT_MOUSE_OUT, (e) => {
+      const { clientPoint } = e;
+      this.props.onMouseOut && this.props.onMouseOut({
+        clientX: clientPoint.x,
+        clientY: clientPoint.y,
+        node: e.node,
+        canvas: this.canvas,
+      });
     });
   }
 
@@ -171,7 +268,7 @@ export default class extends React.Component {
 
   // 移动结束的关心效果
   onChartDragEnd = (e) => {
-    if (this.barLayer.locked) {
+    if (this.line.locked) {
       return;
     }
     const accelerate = e.speedX > 0 ? 3000 : -3000; // 加速度3000画布像素每秒
@@ -180,23 +277,22 @@ export default class extends React.Component {
       speedX: e.speedX,
       accelerateX: accelerate,
       beforeUpdate: (node, frame) => {
-        if (node.position.x >= (this.barLayer.data.length - this.barLayer.showNum) * node.barWidth) {
-          node.setPosition((this.barLayer.data.length - this.barLayer.showNum) * node.barWidth, node.position.y);
-        } else if(node.position.x <= - this.barLayer.width / 2) {
-          node.setPosition(- this.barLayer.width / 2, node.position.y);
-
+        if (node.position.x >= (this.line.data.length - this.line.showNum) * node.barWidth) {
+          node.setPosition((this.line.data.length - this.line.showNum) * node.barWidth, node.position.y);
+        } else if(node.position.x <= - this.line.width / 2) {
+          node.setPosition(- this.line.width / 2, node.position.y);
         }
         node.make();
       }
     });
-    this.barLayer.runAction(this.accelerateAction, (node, action) => {
+    this.line.runAction(this.accelerateAction, (node, action) => {
       // 保证不移除画布
-      if (node.position.x >= (this.barLayer.data.length - this.barLayer.showNum) * node.barWidth) {
+      if (node.position.x >= (this.line.data.length - this.line.showNum) * node.barWidth) {
         node.stopAction(action);
-        node.setPosition((this.barLayer.data.length - this.barLayer.showNum) * node.barWidth, node.position.y);
-      } else if (node.position.x <= - this.barLayer.width / 2) {
+        node.setPosition((this.line.data.length - this.line.showNum) * node.barWidth, node.position.y);
+      } else if (node.position.x <= - this.line.width / 2) {
         node.stopAction(action);
-        node.setPosition(- this.barLayer.width / 2, node.position.y);
+        node.setPosition(- this.line.width / 2, node.position.y);
       }
     });
   }

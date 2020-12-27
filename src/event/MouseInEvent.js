@@ -9,5 +9,16 @@ import Event from './Event';
 export default class extends Event {
   constructor(callback) {
     super(Event.EVENT_MOUSE_IN, callback);
+    this.curPoint = null;
+  }
+
+  moving(point) {
+    if (!this.isProcessed) {
+      this.curPoint = point;
+      setTimeout(() => {
+        this.callback(this);
+        this.eventPoint = point;
+      }, 0);
+    }
   }
 }

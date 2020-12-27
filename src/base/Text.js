@@ -2,9 +2,14 @@ import Node from '../core/Node';
 import Color from '../core/Color';
 
 export default class Text extends Node{
+  static TYPE = {
+    STROKE: 1,
+    FILL: 2,
+  }
   constructor(canvas, style) {
     super(canvas, style);
     this.text = style.text || '';
+    this.type = style.type || Text.TYPE.STROKE;
     this.font = style.font;
     this.size = style.size;
     this.color = new Color(style.color || '#000000FF');
@@ -31,7 +36,12 @@ export default class Text extends Node{
 
   draw(painter) {
     painter.font = `${this.size}px ${this.font}`;
-    painter.fillStyle = this.color.getColor();
-    painter.fillText(this.text, this.position.x / this.scaleX, this.position.y / this.scaleY);
+    if (this.type === Text.TYPE.FILL) {
+      painter.fillStyle = this.color;
+      painter.fillText(this.text, this.position.x / this.scaleX, this.position.y / this.scaleY);
+    } else {
+      painter.strokeStyle = this.color;
+      painter.strokeText(this.text, this.position.x / this.scaleX, this.position.y / this.scaleY);
+    }
   }
 }

@@ -1,4 +1,62 @@
-.axias-chart {
-  width: 100%;
-  height:  300px;
+.form-box{
+  .form-control-box{
+    display: flex;
+    align-items: center;
+    padding: 2px 0;
+    label {
+      font-size: 12px;
+      color: #333333;
+      display: inline-block;
+      width: 120px;
+      text-align: right;
+      margin-right: 12px;
+    }
+    .form-control-input{
+      flex: 1;
+      border: solid 1px #DEDEDE;
+      padding: 2px 0;
+      select, input {
+        width: 100%;
+        border: none;
+        box-sizing: border-box;
+        outline: none;
+      }
+    }
+  }
+}
+@media screen and (max-width: 375px) {
+  .chart-info-box {
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    .chart-attribute {
+      width: 100%;
+    }
+    .base-chart {
+      width: 100%;
+      height:  300px;
+      border: solid 1px #DEDEDE;
+      box-sizing: border-box;
+    }
+  }
+
+}
+@media screen and (min-width: 375px) {
+  .chart-info-box {
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    .chart-attribute {
+      width: 40%;
+      display: inline-block;
+      padding-right: 20px;
+    }
+    .base-chart {
+      width: 60%;
+      height:  300px;
+      display: inline-block;
+      border: solid 1px #DEDEDE;
+      box-sizing: border-box;
+    }
+  }
 }
