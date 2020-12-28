@@ -68,6 +68,7 @@ export default class Curve extends Node {
     }
     return [firstControlPoint, secondControlPoint];
   }
+
   getFirstControlPoints(rhs) {
     const n = rhs.length;
     const tmp = [];
