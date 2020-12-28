@@ -1,25 +1,24 @@
-# OkayChart
+# xchart
 
 #### 介绍
-{**以下是码云平台说明，您可以替换此简介**
-码云是 OSCHINA 推出的基于 Git 的代码托管平台（同时支持 SVN）。专为开发者提供稳定、高效、安全的云端软件开发协作平台
-无论是个人、团队、或是企业，都能够用码云实现代码托管、项目管理、协作开发。企业项目请看 [https://gitee.com/enterprises](https://gitee.com/enterprises)}
+xchart 不同与ECharts或AntV G2仅提供终端的图表方案。xchart 通过对Canvas的封装与抽象，提供了可视化所需的基本图形，并接管Canvas事件处理方法为用户提供了一套完备的处理机制。用户可以通过xchart 定制化开发与自己业务对应的个性化功能。
+xchart 在提供底层处理能力的基础上，同时提供了常用图表的React组件。
 
 #### 软件架构
-软件架构说明
 
+![image](https://github.com/janwool/xchart/blob/master/%E5%8F%AF%E8%A7%86%E5%8C%96%E6%A1%86%E6%9E%B6%E5%9B%BE.png)
 
 #### 安装教程
 
-1. xxxx
-2. xxxx
-3. xxxx
+1. npm install
+2. npm start
+3. http://localhost:8099/index.html
 
 #### 使用说明
 
-1. xxxx
-2. xxxx
-3. xxxx
+1. npm install
+2. npm start
+3. http://localhost:8099/index.html
 
 #### 参与贡献
 
